@@ -1,5 +1,7 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 function LevelSelect() {
+  const navigate = useNavigate();
   return (
     <div className="w-screen h-screen relative overflow-hidden">
       <div className="absolute w-full h-full">
@@ -26,16 +28,19 @@ function LevelSelect() {
           className="max-w-full max-h-full pb-5 object-contain hover-effect"
           src="\src\assets\image\beginner.png"
           alt="Info Instructions"
+          onClick={() => navigate("/gameplay/:level")}
         />
         <img
           className="max-w-full max-h-full pb-5 object-contain hover-effect"
           src="\src\assets\image\inter.png"
           alt="Info Instructions"
+          onClick={() => navigate("/gameplay/:level")}
         />
         <img
           className="max-w-full max-h-full object-contain hover-effect"
           src="\src\assets\image\advance.png"
           alt="Info Instructions"
+          onClick={() => navigate("/gameplay/:level")}
         />
       </div>
       <div className="absolute z-40 hover-effect top-3/4 pt-20 left-20">

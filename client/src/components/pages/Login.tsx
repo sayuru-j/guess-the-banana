@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -107,6 +108,13 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
+        <Link to="/play">
+          <img
+            className="max-w-full max-h-full object-contain pr-[1000px]"
+            src="\src\assets\image\back.png"
+            alt="Back Button"
+          />
+        </Link>
       </div>
     </div>
   );
