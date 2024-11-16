@@ -31,7 +31,7 @@ function PlayPage() {
         playsInline
         controlsList="nodownload"
       >
-        <source src="/src/assets/video/play-bg.mp4" type="video/mp4" />
+        <source src="/src/assets/video/play-bg1.mp4" type="video/mp4" />
       </video>
 
       <div className="w-full h-full absolute flex z-10 p-10">

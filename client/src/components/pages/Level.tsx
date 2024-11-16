@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 function LevelSelect() {
   return (
     <div className="w-screen h-screen relative overflow-hidden">
-      <div className="absolute w-full blur-sm h-full">
+      <div className="absolute w-full h-full">
         <video
           className="absolute top-0 left-0 w-full h-full object-cover z-0 hue-rotate-[330deg]"
           autoPlay
@@ -11,7 +11,7 @@ function LevelSelect() {
           playsInline
           controlsList="nodownload"
         >
-          <source src="\src\assets\video\jungle.mp4" type="video/mp4" />
+          <source src="\src\assets\video\jungle12_1.mp4" type="video/mp4" />
         </video>
       </div>
       <div className="absolute  w-full h-full pt-40 items-start justify-items-center">
