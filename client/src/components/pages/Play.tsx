@@ -11,7 +11,7 @@ function PlayPage() {
     const timer = setTimeout(() => {
       audioRef.current?.play();
       setIsMuted(false);
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -46,6 +46,15 @@ function PlayPage() {
             src={`src/assets/image/sound.png`}
             alt={isMuted ? "Unmute" : "Mute"}
             onClick={handleSoundClick}
+          />
+          <img
+            className="object-cover absolute left-24 pt-8 hover-effect"
+            src="/src/assets/image/info.png"
+            alt="Info"
+            onClick={() => {
+              console.log("Button clicked!");
+              navigate("/info");
+            }}
           />
         </div>
         <div className="w-1/2 relative">
