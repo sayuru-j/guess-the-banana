@@ -29,7 +29,7 @@ function Info() {
 
       <div className="absolute w-full h-full flex items-center justify-center z-10 pt-52">
         <img
-          className="max-w-full max-h-full object-contain"
+          className="max-w-full max-h-full object-contain pb-[300px]"
           src="\src\assets\image\highestscorewood.png"
           alt="Info Instructions"
         />
