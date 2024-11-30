@@ -28,19 +28,19 @@ function LevelSelect() {
           className="max-w-full max-h-full pb-5 object-contain hover-effect"
           src="\src\assets\image\beginner.png"
           alt="Info Instructions"
-          onClick={() => navigate("/gameplay/:level")}
+          onClick={() => navigate("/gameplay/beginner")}
         />
         <img
           className="max-w-full max-h-full pb-5 object-contain hover-effect"
           src="\src\assets\image\inter.png"
           alt="Info Instructions"
-          onClick={() => navigate("/gameplay/:level")}
+          onClick={() => navigate("/gameplay/intermediate")}
         />
         <img
           className="max-w-full max-h-full object-contain hover-effect"
           src="\src\assets\image\advance.png"
           alt="Info Instructions"
-          onClick={() => navigate("/gameplay/:level")}
+          onClick={() => navigate("/gameplay/advanced")}
         />
       </div>
       <div className="absolute z-40 hover-effect top-3/4 pt-20 left-20">

@@ -8,6 +8,7 @@ import Gameplay from "./components/pages/Gameplay";
 import Leaderboard from "./components/pages/Leaderboard";
 import Info from "./components/pages/Info";
 import Signup from "./components/pages/Signup";
+import { advanced, beginner, intermediate } from "./config/gameplay-configs";
 
 const App = () => {
   return (
@@ -19,7 +20,18 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="/play" element={<PlayPage />} />
             <Route path="/level-select" element={<LevelSelect />} />
-            <Route path="/gameplay/:level" element={<Gameplay />} />
+            <Route
+              path="/gameplay/beginner"
+              element={<Gameplay config={beginner} />}
+            />
+            <Route
+              path="/gameplay/intermediate"
+              element={<Gameplay config={intermediate} />}
+            />
+            <Route
+              path="/gameplay/advanced"
+              element={<Gameplay config={advanced} />}
+            />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/signup" element={<Signup />} />
             <Route

@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import { register } from "../../api";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { login, user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: any) => {
@@ -17,11 +18,17 @@ export default function Signup() {
     setIsLoading(true);
 
     try {
-      const response = await login(username, pin);
+      const response = await register(username, pin);
 
-      if (!response.success) {
-        setError(response.message!);
+      const data = await response?.json();
+
+      if (!response?.ok) {
+        setError(data.message);
+        return;
       }
+
+      alert("You can log in!");
+      navigate("/login");
     } catch (err: any) {
       setError(err.message || "Failed to login. Please try again.");
     } finally {
