@@ -7,6 +7,7 @@ import LevelSelect from "./components/pages/Level";
 import Gameplay from "./components/pages/Gameplay";
 import Leaderboard from "./components/pages/Leaderboard";
 import Info from "./components/pages/Info";
+import Signup from "./components/pages/Signup";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
             <Route path="/level-select" element={<LevelSelect />} />
             <Route path="/gameplay/:level" element={<Gameplay />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/signup" element={<Signup />} />
             <Route
               path="/info"
               element={
