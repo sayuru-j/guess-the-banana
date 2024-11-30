@@ -1,9 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ReactNode } from "react";
+import CustomCursor from "./CustomCursor";
 
 interface ProtectedRouteProps {
   children?: ReactNode;
+
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
@@ -17,7 +19,8 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   //   return <Navigate to="/login" replace />;
   // }
 
-  return children ? <>{children}</> : <Outlet />;
+  return  children ? <><CustomCursor/>
+  {children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;
