@@ -5,6 +5,7 @@ export type User = {
 };
 
 export type GameplayConfig = {
+  level: string;
   lives: number;
   initialScore: number;
   initialTime: number;

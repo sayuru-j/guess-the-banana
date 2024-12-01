@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
+import { API_PREFIX } from "../../api";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -29,8 +30,32 @@ export default function LoginPage() {
     }
   };
 
+  const createPlayer = async () => {
+    try {
+      const body = {
+        name: user?.username,
+      };
+
+      const response = await fetch(`${API_PREFIX}/players`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
+      localStorage.setItem("playerCreated", JSON.stringify(true));
+
+      console.log(await response.json());
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (user?.token) {
+      createPlayer();
       navigate("/level-select");
     }
   }, [user?.token]);
@@ -50,7 +75,6 @@ export default function LoginPage() {
           src="/src/assets/image/logintxt.png"
           alt="login"
         />
-
         <div className="relative">
           <img
             className=""
@@ -108,13 +132,22 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
-        <Link to="/play">
-          <img
-            className="max-w-full max-h-full object-contain pr-[1000px]"
-            src="\src\assets\image\back.png"
-            alt="Back Button"
-          />
-        </Link>
+        <div className="flex gap-96 ">
+          <Link to="/play">
+            <img
+              className="max-w-full max-h-full object-contain hover-effect "
+              src="\src\assets\image\back.png"
+              alt="Back Button"
+            />
+          </Link>{" "}
+          <Link to="/signup">
+            <img
+              className="max-w-full flex max-h-full object-contain pt-6 hover-effect"
+              src="\src\assets\image\signupbutton.png"
+              alt="Back Button"
+            />
+          </Link>
+        </div>
       </div>
     </div>
   );

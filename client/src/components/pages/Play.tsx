@@ -1,11 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { AudioControls, AudioPlayer, AudioTrack } from "../AudioPlayer";
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { API_PREFIX } from "../../api";
 
 function PlayPage() {
   const navigate = useNavigate();
   const audioRef = useRef<AudioControls>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,6 +22,29 @@ function PlayPage() {
   const handleSoundClick = () => {
     audioRef.current?.toggle();
     setIsMuted((prev) => !prev);
+  };
+
+  const createPlayer = async () => {
+    try {
+      const body = {
+        name: user?.username,
+      };
+
+      const response = await fetch(`${API_PREFIX}/players`, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+
+      localStorage.setItem("playerCreated", JSON.stringify(true));
+
+      console.log(await response.json());
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -36,32 +62,36 @@ function PlayPage() {
 
       <div className="w-full h-full absolute flex z-10 p-10">
         <div className="w-1/2 relative">
-          <img
-            className="object-cover h-[80vh]"
-            src="src/assets/image/landbanana.png"
-            alt=""
-          />
-          <img
-            className="object-cover absolute bottom-0 hover-effect cursor-pointer"
-            src={`src/assets/image/sound.png`}
-            alt={isMuted ? "Unmute" : "Mute"}
-            onClick={handleSoundClick}
-          />
-          <img
-            className="object-cover absolute left-24 pt-6 hover-effect"
-            src="/src/assets/image/info.png"
-            alt="Info"
-            onClick={() => {
-              console.log("Button clicked!");
-              navigate("/info");
-            }}
-          />
-          <img
-            src="\src\assets\image\LeaderBoard.png"
-            alt="Leader Board"
-            className="pt-6 pl-48 hover-effect cursor-pointer"
-            onClick={() => navigate("/leaderboard")}
-          />
+          <div>
+            <img
+              className="object-cover h-[80vh]"
+              src="src/assets/image/landbanana.png"
+              alt=""
+            />
+            <div className="flex items-center gap-6 absolute bottom-0">
+              <img
+                className="hover-effect cursor-pointer"
+                src={`src/assets/image/sound.png`}
+                alt={isMuted ? "Unmute" : "Mute"}
+                onClick={handleSoundClick}
+              />
+              <img
+                className="hover-effect cursor-pointer"
+                src="/src/assets/image/info.png"
+                alt="Info"
+                onClick={() => {
+                  console.log("Button clicked!");
+                  navigate("/info");
+                }}
+              />
+              <img
+                src="\src\assets\image\LeaderBoard.png"
+                alt="Leader Board"
+                className="hover-effect cursor-pointer"
+                onClick={() => navigate("/leaderboard")}
+              />
+            </div>
+          </div>
         </div>
         <div className="w-1/2 relative">
           <img
@@ -74,7 +104,12 @@ function PlayPage() {
             className="object-cover absolute bottom-0 right-0 hover-effect cursor-pointer"
             src="src/assets/image/play.png"
             alt=""
-            onClick={() => navigate("/login")}
+            onClick={async () => {
+              if (user) {
+                await createPlayer();
+              }
+              navigate("/login");
+            }}
           />
         </div>
       </div>

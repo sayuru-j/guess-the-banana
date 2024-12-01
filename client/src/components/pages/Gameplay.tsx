@@ -2,6 +2,9 @@ import { Link } from "react-router-dom";
 import { GameplayConfig } from "../../@types";
 import { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_PREFIX } from "../../api";
+import { returnGameLevelAsIntegerFromConfig } from "../../utils/level";
+import { useAuth } from "../../context/AuthContext";
 
 type GameplayProps = {
   config: GameplayConfig;
@@ -26,6 +29,8 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
     show: false,
     isError: false,
   });
+  const [showQuitConfirmation, setShowQuitConfirmation] = useState(false);
+  const { user } = useAuth();
 
   const navigate = useNavigate();
 
@@ -89,6 +94,7 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
         setScore((prev) => prev - config.reward.score);
       }
       showFeedback("Time's up!", true);
+      setIsGameover(true);
     }
   }, [timeLeft, isGameover, config.initialTime]);
 
@@ -102,6 +108,38 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
     }
   }, [lives]);
 
+  console.log(question);
+
+  useEffect(() => {
+    console.log("score", score);
+
+    const saveGameplay = async () => {
+      try {
+        const body = {
+          level: returnGameLevelAsIntegerFromConfig(config),
+          score,
+        };
+
+        const response = await fetch(`${API_PREFIX}/gameplay`, {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+
+        console.log(await response.json());
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (isGameover) {
+      void saveGameplay();
+    }
+  }, [isGameover]);
+
   const handleRetry = () => {
     navigate("/level-select");
   };
@@ -110,8 +148,44 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
     navigate("/play");
   };
 
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowQuitConfirmation(true);
+  };
   return (
     <>
+      {showQuitConfirmation && (
+        <div className="fixed flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="relative flex items-center justify-center pointer-events-auto">
+            <img
+              className="justify-center"
+              src="\src\assets\image\highestscorewood.png"
+              alt=""
+            />
+            <h2 className="absolute flex flex-col items-center pb-36 font-spenbeb text-white">
+              <span className="text-4xl">Do you want </span>
+              <span className="text-4xl">to quit?</span>
+            </h2>
+
+            <div className="flex gap-20 absolute pt-32">
+              <div
+                className="cursor-pointer hover-effect"
+                onClick={() => navigate("/play")}
+              >
+                <img src="\src\assets\image\Yes.png" alt="Yes" />
+              </div>
+
+              <div
+                className="cursor-pointer hover-effect"
+                onClick={() => setShowQuitConfirmation(false)}
+              >
+                <img src="\src\assets\image\No.png" alt="No" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {feedback.show && (
         <div
           className={`fixed top-1/4 left-1/2 transform -translate-x-1/2 z-50 py-4 px-8 rounded-xl
@@ -130,8 +204,8 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
       )}
 
       {isGameover && (
-        <div className="w-screen absolute z-40 h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="relative flex items-center justify-center">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="relative flex items-center justify-center pointer-events-auto">
             <img
               className="justify-center"
               src="\src\assets\image\highestscorewood.png"
@@ -164,7 +238,7 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
       )}
 
       <div className="w-screen h-screen relative overflow-hidden">
-        <div className="absolute w-full h-full">
+        <div className="absolute w-full h-full z-30">
           <div className="">
             <div className="relative display flex justify-between">
               <div className="absolute pl-36 pt-20">
@@ -281,13 +355,13 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
             </div>
 
             <div className="top-3/4 relative z-40 pl-24 bottom: -614px; bottom-[-614px]">
-              <Link to="/play">
+              <div onClick={handleBackClick}>
                 <img
-                  className="hover-effect max-w-full max-h-full"
+                  className="hover-effect max-w-full max-h-full cursor-pointer"
                   src="\src\assets\image\back.png"
                   alt="Back Button"
                 />
-              </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -27,7 +27,6 @@ export default function Signup() {
         return;
       }
 
-      alert("You can log in!");
       navigate("/login");
     } catch (err: any) {
       setError(err.message || "Failed to login. Please try again.");
@@ -115,9 +114,9 @@ export default function Signup() {
             </button>
           </form>
         </div>
-        <Link to="/play">
+        <Link to="/login">
           <img
-            className="max-w-full max-h-full object-contain pr-[1000px]"
+            className="max-w-full max-h-full object-contain pr-[1000px] hover-effect"
             src="\src\assets\image\back.png"
             alt="Back Button"
           />

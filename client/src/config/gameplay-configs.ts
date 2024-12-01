@@ -1,6 +1,7 @@
 import { GameplayConfig } from "../@types";
 
 export const beginner: GameplayConfig = {
+  level: "beginner",
   lives: 5,
   initialScore: 0,
   reward: {
@@ -11,6 +12,7 @@ export const beginner: GameplayConfig = {
 };
 
 export const intermediate: GameplayConfig = {
+  level: "intermediate",
   lives: 3,
   initialScore: 0,
   reward: {
@@ -22,6 +24,7 @@ export const intermediate: GameplayConfig = {
 
 export const advanced: GameplayConfig = {
   lives: 2,
+  level: "advanced",
   initialScore: 0,
   reward: {
     score: 1,
