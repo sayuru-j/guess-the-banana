@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { GameplayConfig } from "../../@types";
 import { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type GameplayProps = {
   config: GameplayConfig;
@@ -17,9 +18,27 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
   const [question, setQuestion] = useState<Question>();
   const [isLoading, setIsLoading] = useState(false);
   const [isGameover, setIsGameover] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(
+    Math.floor(config.initialTime / 1000)
+  );
+  const [feedback, setFeedback] = useState({
+    message: "",
+    show: false,
+    isError: false,
+  });
+
+  const navigate = useNavigate();
+
+  const showFeedback = (message: string, isError: boolean) => {
+    setFeedback({ message, show: true, isError });
+    setTimeout(() => {
+      setFeedback((prev) => ({ ...prev, show: false }));
+    }, 2000);
+  };
 
   const fetchQuestion = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch("https://marcconrad.com/uob/banana/api.php");
 
       if (response.ok) {
@@ -29,30 +48,49 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
           solution: data.solution,
         });
         setIsLoading(false);
+        setTimeLeft(Math.floor(config.initialTime / 1000));
         return;
       }
     } catch (err) {
       console.error("Error fetching question:", err);
+      setIsLoading(false);
     }
   };
 
   const checkTheAnswer = async (answer: number) => {
     if (answer === question?.solution) {
       setScore((prev) => prev + config.reward.score);
+      showFeedback("Correct Answer!", false);
       setIsLoading(true);
       await fetchQuestion();
+      setTimeLeft(
+        (prev) => prev + Math.floor(config.reward.timeIncrement / 1000)
+      );
     } else {
       setLives((prev) => prev - 1);
-
-      if (score === 0) {
-        alert("Wrong answer!");
-        return;
+      if (score > 0) {
+        setScore((prev) => prev - config.reward.score);
       }
-
-      alert("Wrong answer!");
-      setScore((prev) => prev - config.reward.score);
+      showFeedback("Wrong Answer!", true);
     }
   };
+
+  useEffect(() => {
+    if (timeLeft > 0 && !isGameover) {
+      const timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    } else if (timeLeft === 0 && !isGameover) {
+      setLives((prev) => prev - 1);
+      setTimeLeft(Math.floor(config.initialTime / 1000));
+      if (score > 0) {
+        setScore((prev) => prev - config.reward.score);
+      }
+      showFeedback("Time's up!", true);
+    }
+  }, [timeLeft, isGameover, config.initialTime]);
 
   useEffect(() => {
     void fetchQuestion();
@@ -64,11 +102,33 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
     }
   }, [lives]);
 
-  console.log(question);
-  console.log(score);
+  const handleRetry = () => {
+    navigate("/level-select");
+  };
+
+  const handleQuit = () => {
+    navigate("/play");
+  };
 
   return (
     <>
+      {feedback.show && (
+        <div
+          className={`fixed top-1/4 left-1/2 transform -translate-x-1/2 z-50 py-4 px-8 rounded-xl
+            transition-opacity duration-300 ease-in-out`}
+        >
+          <div className="relative flex items-center pb-10 justify-center">
+            <h2
+              className={`absolute font-spenbeb text-3xl whitespace-nowrap -translate-y-2   ${
+                feedback.isError ? "text-red-500" : "text-white"
+              }`}
+            >
+              {feedback.message}
+            </h2>
+          </div>
+        </div>
+      )}
+
       {isGameover && (
         <div className="w-screen absolute z-40 h-screen flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="relative flex items-center justify-center">
@@ -77,13 +137,32 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
               src="\src\assets\image\highestscorewood.png"
               alt=""
             />
-            <h2 className="absolute flex flex-col items-center font-spenbeb text-white">
+            <h2 className="absolute flex flex-col pb-36 font-spenbeb text-white">
               <span className="text-6xl">Game Over</span>
-              <span>Udith ponnappu</span>
             </h2>
+
+            <div className="flex gap-20 absolute pt-32">
+              <div
+                className="cursor-pointer hover-effect"
+                onClick={handleRetry}
+              >
+                <img src="\src\assets\image\retry.png" alt="Retry" />
+                <h1 className="font-spenbeb text-white text-center pt-2">
+                  Retry
+                </h1>
+              </div>
+
+              <div className="cursor-pointer hover-effect" onClick={handleQuit}>
+                <img src="\src\assets\image\wrongcros.png" alt="Quit" />
+                <h1 className="font-spenbeb text-white text-center pt-2">
+                  Quit
+                </h1>
+              </div>
+            </div>
           </div>
         </div>
       )}
+
       <div className="w-screen h-screen relative overflow-hidden">
         <div className="absolute w-full h-full">
           <div className="">
@@ -94,7 +173,6 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
                   src="\src\assets\image\lives.png"
                   alt="Lives"
                 />
-
                 <div className="flex gap-1">
                   {Array(lives)
                     .fill(0)
@@ -109,6 +187,11 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
                 </div>
               </div>
               <div className="absolute top-0 right-0 p-20">
+                <div className="relative flex items-center justify-center mb-4">
+                  <h2 className="absolute font-spenbeb text-2xl text-white inline-flex items-center">
+                    Time <span className="ml-2 text-4xl">{timeLeft}s</span>
+                  </h2>
+                </div>
                 <div className="relative flex items-center justify-center">
                   <img
                     className=""
@@ -121,6 +204,7 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
                 </div>
               </div>
             </div>
+
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center">
               <div className="flex relative items-center justify-center">
                 <img
@@ -146,13 +230,13 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
                           opacity="0.2"
                           fill="#000"
                           d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
-                   s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
-                   c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"
+                          s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+                          c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"
                         />
                         <path
                           fill="#000"
                           d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
-                   C22.32,8.481,24.301,9.057,26.013,10.047z"
+                          C22.32,8.481,24.301,9.057,26.013,10.047z"
                         >
                           <animateTransform
                             attributeType="xml"
@@ -178,34 +262,28 @@ const Gameplay: FC<GameplayProps> = ({ config }) => {
             </div>
 
             <div className="absolute z-40 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex justify-center space-x-4 mt-72">
-              {[...Array(10).keys()].map((num) => {
-                return (
-                  <div
-                    onClick={() => {
-                      checkTheAnswer(num);
-                    }}
-                    className="hover:scale-125 transition-all duration-300 ease-in-out"
-                    key={num}
-                  >
-                    <div className="relative">
-                      <img src="\src\assets\image\gameplaybutton.png" alt="" />
-                      <div className="absolute inset-0 flex items-center justify-center text-white font-spenbeb text-2xl mb-1">
-                        {num}
-                      </div>
+              {[...Array(10).keys()].map((num) => (
+                <div
+                  onClick={() => {
+                    checkTheAnswer(num);
+                  }}
+                  className="hover:scale-125 transition-all duration-300 ease-in-out"
+                  key={num}
+                >
+                  <div className="relative">
+                    <img src="\src\assets\image\gameplaybutton.png" alt="" />
+                    <div className="absolute inset-0 flex items-center justify-center text-white font-spenbeb text-2xl mb-1">
+                      {num}
                     </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
 
-            <div className="absolute bottom-0 pb-10 left-[80rem]">
-              <img src="\src\assets\image\submit.png" alt="" />
-            </div>
-
-            <div className="top-3/4 relative pl-24 bottom: -614px; bottom-[-614px]">
+            <div className="top-3/4 relative z-40 pl-24 bottom: -614px; bottom-[-614px]">
               <Link to="/play">
                 <img
-                  className="hover-effect max-w-full max-h-full "
+                  className="hover-effect max-w-full max-h-full"
                   src="\src\assets\image\back.png"
                   alt="Back Button"
                 />

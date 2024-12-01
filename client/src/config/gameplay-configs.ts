@@ -7,7 +7,7 @@ export const beginner: GameplayConfig = {
     score: 10,
     timeIncrement: 45000,
   },
-  initialTime: 60000,
+  initialTime: 45000,
 };
 
 export const intermediate: GameplayConfig = {
@@ -17,7 +17,7 @@ export const intermediate: GameplayConfig = {
     score: 5,
     timeIncrement: 30000,
   },
-  initialTime: 20000,
+  initialTime: 30000,
 };
 
 export const advanced: GameplayConfig = {
@@ -27,5 +27,5 @@ export const advanced: GameplayConfig = {
     score: 1,
     timeIncrement: 15000,
   },
-  initialTime: 10000,
+  initialTime: 15000,
 };

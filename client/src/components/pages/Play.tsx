@@ -48,13 +48,19 @@ function PlayPage() {
             onClick={handleSoundClick}
           />
           <img
-            className="object-cover absolute left-24 pt-8 hover-effect"
+            className="object-cover absolute left-24 pt-6 hover-effect"
             src="/src/assets/image/info.png"
             alt="Info"
             onClick={() => {
               console.log("Button clicked!");
               navigate("/info");
             }}
+          />
+          <img
+            src="\src\assets\image\LeaderBoard.png"
+            alt="Leader Board"
+            className="pt-6 pl-48 hover-effect cursor-pointer"
+            onClick={() => navigate("/leaderboard")}
           />
         </div>
         <div className="w-1/2 relative">
